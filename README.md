@@ -52,7 +52,7 @@ streamlit run app/dashboard.py
 - Время загрузки vs Bounce Rate  
 
 ## Лицензия  
-MIT License  
+Apache License
 
 ## Автор  
 [Гуриков Илья Олегович]  

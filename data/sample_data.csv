@@ -1,0 +1,6 @@
+user_id,device_type,page_load_time_seconds,bounce_rate,conversion
+1,desktop,2.5,0.3,1
+2,mobile,4.2,0.7,0
+3,desktop,1.8,0.1,1
+4,mobile,5.5,0.9,0
+5,desktop,3.1,0.4,1

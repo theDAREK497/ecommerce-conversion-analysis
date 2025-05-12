@@ -54,5 +54,3 @@ streamlit run app/dashboard.py
 ## Лицензия  
 Apache License
 
-## Автор  
-[Гуриков Илья Олегович]  

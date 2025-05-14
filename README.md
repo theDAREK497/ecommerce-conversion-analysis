@@ -52,5 +52,5 @@ streamlit run app/dashboard.py
 - Время загрузки vs Bounce Rate  
 
 ## Лицензия  
-Apache License
+MIT License
 

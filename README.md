@@ -1,39 +1,45 @@
 # E-commerce Conversion Analysis
 
+[![CI](https://github.com/theDAREK497/ecommerce-conversion-analysis/actions/workflows/ci.yml/badge.svg)](https://github.com/theDAREK497/ecommerce-conversion-analysis/actions/workflows/ci.yml)
+
 A compact Python analytics project for exploring website performance and conversion metrics through reusable processing functions, visualizations and a Streamlit dashboard.
 
-> **Scope:** portfolio/data-analysis showcase built around sample CSV data.
+> **Scope:** portfolio/data-analysis showcase built around sample CSV data. The bundled data is illustrative rather than a real commercial dataset.
 
 ## What it analyses
 
-The current dashboard focuses on:
+The dashboard focuses on:
 
 - average page-load time;
 - overall conversion rate;
+- overall bounce rate;
 - conversion by device type;
-- the underlying sample observations used to calculate the metrics.
+- the relationship between page-load time and bounce rate;
+- the source observations used to calculate the metrics.
 
-## Dashboard
-
-The Streamlit app loads `data/sample_data.csv`, calculates summary metrics and renders a conversion-by-device visualization.
+## Architecture
 
 ```mermaid
 flowchart LR
-    CSV[Sample CSV] --> Processing[Pandas processing]
-    Processing --> Metrics[Conversion metrics]
-    Processing --> Plot[Visualization]
+    CSV[Sample CSV] --> Validation[Schema validation & cleaning]
+    Validation --> Metrics[Business metrics]
+    Validation --> Charts[Matplotlib charts]
     Metrics --> UI[Streamlit dashboard]
-    Plot --> UI
+    Charts --> UI
+    Validation --> Tests[Pytest]
 ```
+
+The Streamlit layer is intentionally thin. Reusable analytical logic lives under `src/`, which keeps metric definitions independently testable.
 
 ## Tech stack
 
-- Python
+- Python 3.13
 - Pandas
 - Matplotlib
 - Streamlit
-- Jupyter Notebook
-- CSV-based sample data
+- Pytest
+- Ruff / Bandit / pip-audit
+- GitHub Actions
 
 ## Quick start
 
@@ -44,58 +50,66 @@ cd ecommerce-conversion-analysis
 python -m venv .venv
 ```
 
-Windows:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
-
-Run the dashboard:
+Install dependencies and run the dashboard:
 
 ```bash
+python -m pip install -r requirements.txt
 streamlit run app/dashboard.py
 ```
 
-For notebook-based exploration:
+## Validation
 
 ```bash
-jupyter notebook
+python -m pip install -r requirements-dev.txt
+ruff check src app tests
+python -m pytest -q
+bandit -r src app -q
+pip-audit -r requirements.txt
 ```
+
+CI runs the same linting, tests, security scan and dependency audit on every push and pull request.
+
+## Sample metrics
+
+For the bundled five-row sample dataset, the expected headline values are:
+
+- average page load: **3.42 seconds**;
+- conversion rate: **60%**;
+- bounce rate: **48%**.
+
+These values are covered by automated tests so changes to the metric definitions are visible in CI.
 
 ## Project structure
 
 ```text
 app/
-  dashboard.py        Streamlit UI
+  dashboard.py          Streamlit presentation layer
 data/
-  sample_data.csv     example dataset
+  sample_data.csv       illustrative dataset
 src/
-  data_processing.py  loading and metric calculations
-  visualization.py    chart generation
-notebooks/             exploratory analysis
-docs/                  generated images / supporting output
-requirements.txt
+  data_processing.py    validation, cleaning and metric calculations
+  visualization.py      reusable Matplotlib figures
+tests/
+  test_data_processing.py
+  test_dashboard.py
+notebooks/               exploratory analysis
+docs/                    supporting output
+requirements.txt         runtime dependencies
+requirements-dev.txt     test / quality tooling
 ```
-
-## Why the project is structured this way
-
-Even for a small analysis, keeping metric calculation and visualization outside the UI makes the code easier to reuse and test.
-
-The Streamlit layer is responsible for presentation, while `src/` contains the reusable analytical logic.
 
 ## Limitations
 
-The bundled dataset is a sample, so the dashboard should be read as an implementation example rather than as a real commercial performance study.
+This repository demonstrates implementation quality and analytical structure, not a production e-commerce study.
 
 A larger version could add:
 
 - time-series conversion trends;
-- funnel stages;
+- funnel-stage analysis;
 - traffic-source segmentation;
-- confidence intervals / experiment analysis;
-- automated data-quality checks;
-- database or warehouse input;
+- experiment confidence intervals;
+- automated data-quality reports;
+- warehouse or database inputs;
 - deployable dashboard infrastructure.
 
 ## License

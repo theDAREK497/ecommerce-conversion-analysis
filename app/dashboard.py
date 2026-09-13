@@ -1,29 +1,46 @@
-import streamlit as st
-import sys
 import os
+import sys
+from pathlib import Path
 
-# Добавьте путь к папке src
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+ROOT_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, os.fspath(ROOT_DIR))
 
-import pandas as pd
-from src.data_processing import load_data, calculate_metrics
-from src.visualization import plot_conversion_by_device
+import streamlit as st  # noqa: E402
 
-st.title("SEO & Conversion Dashboard")
+from src.data_processing import calculate_metrics, load_data  # noqa: E402
+from src.visualization import (  # noqa: E402
+    plot_conversion_by_device,
+    plot_page_load_vs_bounce,
+)
 
-# Загрузка данных
-df = load_data('data/sample_data.csv')
+DATA_PATH = ROOT_DIR / "data" / "sample_data.csv"
 
-# Отображение метрик
+st.set_page_config(page_title="E-commerce Conversion Analysis", layout="wide")
+st.title("E-commerce Conversion Analysis")
+st.caption("Sample analytics dashboard for website performance and conversion metrics.")
+
+df = load_data(DATA_PATH)
 metrics = calculate_metrics(df)
-st.metric("Среднее время загрузки страницы", f"{metrics['avg_page_load']:.2f} секунд")
-st.metric("Конверсия", f"{metrics['conversion_rate']:.2f}%")
 
-# График конверсии по устройствам
-st.subheader("Конверсия по типу устройства")
-plot_conversion_by_device(df)
-st.image('docs/images/conversion_by_device.png')
+metric_columns = st.columns(3)
+metric_columns[0].metric(
+    "Average page load",
+    f"{metrics['avg_page_load']:.2f} s",
+)
+metric_columns[1].metric(
+    "Conversion rate",
+    f"{metrics['conversion_rate']:.1f}%",
+)
+metric_columns[2].metric(
+    "Bounce rate",
+    f"{metrics['bounce_rate']:.1f}%",
+)
 
-# Отображение данных
-st.subheader("Исходные данные")
-st.write(df)
+st.subheader("Conversion by device")
+st.pyplot(plot_conversion_by_device(df))
+
+st.subheader("Page load time vs bounce rate")
+st.pyplot(plot_page_load_vs_bounce(df))
+
+st.subheader("Source data")
+st.dataframe(df, use_container_width=True)
